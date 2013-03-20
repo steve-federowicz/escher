@@ -57,6 +57,7 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
     var decimal_format_3 = d3.format('.3f');
     var has_flux = false;
     var has_flux_comparison = false;
+    var has_flux_deviation = false;
     var has_metabolites = false;
     var has_metabolite_deviation = false;
 
@@ -65,7 +66,8 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
         has_flux = true;
         data = parse_flux_1(data, flux);
         if (flux2) {
-            has_flux_comparison = true;
+            has_flux_deviation = true;
+	    has_flux_comparison = false;
             data = parse_flux_2(data, flux2);
         }
     }
@@ -108,14 +110,15 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
         .domain([0, 40, 200])
         .range([1, 15, 15]);
     var flux_color = d3.scale.linear()
-        .domain([0, 0.1, 15, 70])
+        .domain([0, 0.1, 80, 400])
         .range(["rgb(200,200,200)", "rgb(150,150,255)", "blue", "red"]);
     var metabolite_concentration_scale = d3.scale.linear()
 	.domain([0, 10])
 	.range([15, 200]);
     var metabolite_color_scale = d3.scale.linear()
-	.domain([0, 1.2])
-        .range(["#FEF0D9", "#B30000"]);
+	.domain([0, 0.5, 1.2, 4])
+	.range(colorbrewer.OrRd[4])
+        // .range(["#FEF0D9", "#B30000", "#FF0000"]);
 	// .domain([0, 0.1, 0.2, 0.5, 1])
         // .range(["#FEF0D9", "#FEE8C8", "#FEE8C8", "#E34A33", "#B30000"]);
 
@@ -284,6 +287,8 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
             var t = d.text;
             if (has_flux_comparison)
                 t += " ("+decimal_format(d.flux1)+"/"+decimal_format(d.flux2)+": "+decimal_format(d.flux)+")";
+	    else if (has_flux_deviation)
+		t +=  " ("+decimal_format(d.flux1)+" \xB1 "+decimal_format(d.flux2)+")";
             else if (d.flux) t += " ("+decimal_format(d.flux)+")";
             else if (has_flux) t += " (0)";
             return t;
@@ -360,18 +365,18 @@ function parse_flux_1(data, flux) {
 }
 
 function parse_flux_2(data, flux2) {
-    data.reaction_paths = data.reaction_paths.map( function(o) {
-        if (o.id in flux2 && o.flux) {
-            o.flux = (parseFloat(flux2[o.id]) - o.flux);
-        }
-        return o;
-    });
+    // data.reaction_paths = data.reaction_paths.map( function(o) {
+    //     if (o.id in flux2 && o.flux) {
+    //         o.flux = (parseFloat(flux2[o.id]) - o.flux);
+    //     }
+    //     return o;
+    // });
     data.reaction_labels = data.reaction_labels.map( function(o) {
         if (o.flux) o.flux1 = o.flux;
         else o.flux1 = 0;
         if (o.text in flux2) o.flux2 = parseFloat(flux2[o.text]);
         else o.flux2 = 0;
-        o.flux = (o.flux2 - o.flux1);
+        // o.flux = (o.flux2 - o.flux1);
         return o;
     });
     return data;
@@ -383,7 +388,7 @@ function parse_metabolites_1(data, metabolites) {
     data.metabolite_circles = data.metabolite_circles.map( function(o) {
         if (o.id in metabolites && skip_these_metabolites.indexOf(o.id)==-1) {
             o.metabolite_concentration = parseFloat(metabolites[o.id])
-	    if (do_not_size_these_metabolites.indexOf(o.id)>=0) {
+	    if (o.r < 20) { // do_not_size_these_metabolites.indexOf(o.id)>=0) {
 		o.should_size = false;
 		o.should_color = true;
 	    } else { 
