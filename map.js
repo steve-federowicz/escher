@@ -61,6 +61,8 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
     var has_metabolites = false;
     var has_metabolite_deviation = false;
 
+    var hide_values_in_labels = true;
+
     // parse the data objects and attach values to map objects
     if (flux) {
         has_flux = true;
@@ -285,6 +287,7 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
         .enter().append("text")
         .text(function(d) {
             var t = d.text;
+	    if (hide_values_in_labels) return t;
             if (has_flux_comparison)
                 t += " ("+decimal_format(d.flux1)+"/"+decimal_format(d.flux2)+": "+decimal_format(d.flux)+")";
 	    else if (has_flux_deviation)
@@ -314,6 +317,7 @@ function visualizeit(data, flux, flux2, metabolites, metabolites2) {
         .enter().append("text")
         .text(function(d) {
             var t = d.text;
+	    if (hide_values_in_labels) return t;
 	    if (isNaN(d.metabolite_concentration)) {}
 	    else if (has_metabolite_deviation) {
 		var a = (isNaN(d.metabolite_concentration) ? "-" : decimal_format(d.metabolite_concentration));
