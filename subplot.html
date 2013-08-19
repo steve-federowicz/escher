@@ -66,7 +66,7 @@ var scatter = Scatter()
 histogram = Histogram().setup({ selection: subplot.frame_by_row_col(0, 1) });
 data_menu1 = DataMenu().setup({
     selection: d3.select('#menu1'),
-    getdatafiles: 'data/example',
+    datafiles: ['data/example/ec-gene-length.json', 'data/example/tm-gene-length.json'],
     update_callback: function(data) {
         histogram.collect_data(data, 0);
         scatter.collect_data(data, 'x', 0); 
@@ -74,7 +74,7 @@ data_menu1 = DataMenu().setup({
 });
 data_menu2 = DataMenu().setup({
     selection: d3.select('#menu2'),
-    getdatafiles: 'data/example',
+    datafiles: ['data/example/ec-gene-length.json', 'data/example/tm-gene-length.json'],
     update_callback: function(data) { 
         histogram.collect_data(data, 1);
         scatter.collect_data(data, 'y', 0); 

@@ -58,12 +58,12 @@ fill: rgb(80,80,80);
 scatter = Scatter().setup({ fillScreen: true });
 data_menu1 = DataMenu().setup({ 
     selection: d3.select('#menu1'),
-    getdatafiles: 'data/example',
+    datafiles: ['data/example/ec-gene-length.json', 'data/example/tm-gene-length.json'],
     update_callback: function(data) { return scatter.collect_data(data, 'x', 0); }
 });
 data_menu2 = DataMenu().setup({
     selection: d3.select('#menu2'),
-    getdatafiles: 'data/example',
+    datafiles: ['data/example/ec-gene-length.json', 'data/example/tm-gene-length.json'],
     update_callback: function(data) { return scatter.collect_data(data, 'y', 0); }
 });
 update_on_resize(scatter.update_size);

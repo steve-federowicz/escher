@@ -64,12 +64,12 @@ width: 10%;
 histogram = Histogram().setup({ fillScreen: true });
 data_menu1 = DataMenu().setup({ 
     selection: d3.select('#menu1'),
-    getdatafiles: 'data/example',
+    datafiles: ['data/example/ec-gene-length.json', 'data/example/tm-gene-length.json'],
     update_callback: function(data) { return histogram.collect_data(data, 0); }
 });
 data_menu2 = DataMenu().setup({
     selection: d3.select('#menu2'),
-    getdatafiles: 'data/example',
+    datafiles: ['data/example/ec-gene-length.json', 'data/example/tm-gene-length.json'],
     update_callback: function(data) { return histogram.collect_data(data, 1); }
 });
 update_on_resize(histogram.update_size);
