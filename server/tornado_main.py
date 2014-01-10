@@ -1,3 +1,5 @@
+from ko_server import koHandler
+
 import os, subprocess
 import tornado.ioloop
 import tornado.web
@@ -7,9 +9,8 @@ import json
 import re
 
 # set directory to server
-directory = os.path.abspath(os.path.dirname(__file__).replace('server',''))
+directory = re.sub('server\%s?$' % os.sep, '', os.path.abspath(os.path.dirname(__file__)))
 port = 7777
-
 print 'serving directory %s on port %d' % (directory, port)
 
 # define port
@@ -86,6 +87,7 @@ settings = {"debug": "True"}
 
 application = tornado.web.Application([
     (r".*(/data/.*)", MainDataHandler),
+    (r".*/knockout-map/(.*)", koHandler),
     (r"/(.*)", MainHandler),
 ], **settings)
  

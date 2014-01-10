@@ -4,6 +4,7 @@
 .DS_Store
 *.pyc
 .#*
-build/
-dist/
 visbio.egg-info/
+build/
+pub/
+dist/
