@@ -173,6 +173,10 @@ small {
   font-size:14px;
 }
 
+mono {
+  font-family:monospaced;
+}
+
 hr {
   border:0;
   background:#e5e5e5;
