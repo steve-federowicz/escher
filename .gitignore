@@ -5,6 +5,6 @@
 *.pyc
 .#*
 visbio.egg-info/
-build/
 pub/
 dist/
+TAGS
