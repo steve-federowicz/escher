@@ -424,7 +424,7 @@ var requirejs, require, define;
     };
 }());
 
-define("almond", function(){});
+define("../build/almond", function(){});
 
 /**
  * vkBeautify - javascript plugin to pretty-print or minify text in XML, JSON, CSS and SQL formats.
@@ -784,7 +784,7 @@ define('lib/vkbeautify',[],function() {
 
 });
 
-define('vis/utils',["lib/vkbeautify"], function(vkbeautify) {
+define('utils',["lib/vkbeautify"], function(vkbeautify) {
     return { set_options: set_options,
              setup_svg: setup_svg,
 	     resize_svg: resize_svg,
@@ -829,9 +829,14 @@ define('vis/utils',["lib/vkbeautify"], function(vkbeautify) {
     function set_options(options, defaults) {
         if (options===undefined) return defaults;
         var i = -1,
-            out = defaults,
-            keys = window.Object.keys(options);
-        while (++i < keys.length) out[keys[i]] = options[keys[i]];
+            out = defaults;
+	for (var key in options) {
+	    var val = options[key];
+	    if (val===undefined) {
+		val = null;
+	    }
+	    out[key] = val;
+	}
         return out;
     };
     function setup_svg(selection, selection_is_svg, margins, fill_screen) {
@@ -1713,7 +1718,7 @@ return function(container, config) {
 
 
 
-define('builder/draw',["vis/utils"], function(utils) {
+define('draw',["utils"], function(utils) {
     return { create_reaction: create_reaction,
 	     update_reaction: update_reaction,
 	     create_node: create_node,
@@ -1807,7 +1812,7 @@ define('builder/draw',["vis/utils"], function(utils) {
 	var decimal_format = d3.format('.4g');
 	sel.text(function(d) { 
             var t = d.abbreviation;
-            if (d.flux) t += " ("+decimal_format(d.flux)+")";
+            if (d.flux!==null) t += " ("+decimal_format(d.flux)+")";
             else if (has_flux) t += " (0)";
             return t;
 	}).attr('transform', function(d) {
@@ -1897,7 +1902,7 @@ define('builder/draw',["vis/utils"], function(utils) {
             })
             .style('stroke', function(d) {
 		if (has_flux) 
-		    return d.flux ? scale.flux_color(Math.abs(d.flux)) : scale.flux_color(0);
+		    return d.flux!==null ? scale.flux_color(Math.abs(d.flux)) : scale.flux_color(0);
 		else
 		    return default_reaction_color;
 	    })
@@ -2017,7 +2022,7 @@ define('builder/draw',["vis/utils"], function(utils) {
 		.attr('r', function(d) {
 		    if (d.node_type == 'metabolite') {
 			if (has_node_data && node_data_style.indexOf('Size')!==1) {
-			    return scale.size(scale.node_size(d.data));
+			    return scale.size(scale.node_size(d.data!==null ? d.data : 0));
 			} else {
 			    return scale.size(d.node_is_primary ? 15 : 10); 
 			}
@@ -2028,7 +2033,7 @@ define('builder/draw',["vis/utils"], function(utils) {
 		.style('fill', function(d) {
 		    if (d.node_type=='metabolite') {
 			if (has_node_data && node_data_style.indexOf('Color')!==1) {
-			    return scale.node_color(d.data);
+			    return scale.node_color(d.data!==null ? d.data : 0);
 			} else {
 			    return 'rgb(224, 134, 91)';
 			}
@@ -2049,7 +2054,7 @@ define('builder/draw',["vis/utils"], function(utils) {
             .text(function(d) {	
 		var decimal_format = d3.format('.4g');
 		var t = d.bigg_id_compartmentalized;
-		if (d.data) t += " ("+decimal_format(d.data)+")";
+		if (d.data!==null) t += " ("+decimal_format(d.data)+")";
 		else if (has_node_data) t += " (0)";
 		return t;
 	    })
@@ -2135,7 +2140,7 @@ define('builder/draw',["vis/utils"], function(utils) {
 
 });
 
-define('builder/build',["vis/utils"], function(utils) {
+define('build',["utils"], function(utils) {
     return { new_reaction: new_reaction,
 	     rotate_nodes: rotate_nodes,
 	     move_node_and_dependents: move_node_and_dependents };
@@ -2529,7 +2534,7 @@ define('builder/build',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/Behavior',["vis/utils", "builder/build"], function(utils, build) {
+define('Behavior',["utils", "build"], function(utils, build) {
     /** Defines the set of click and drag behaviors for the map, and keeps track
      of which behaviors are activated.
 
@@ -2998,7 +3003,7 @@ define('builder/Behavior',["vis/utils", "builder/build"], function(utils, build)
     }
 });
 
-define('builder/Scale',["vis/utils"], function(utils) {
+define('Scale',["utils"], function(utils) {
     /** 
      */
 
@@ -3078,7 +3083,7 @@ define('builder/Scale',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/DirectionArrow',["vis/utils"], function(utils) {
+define('DirectionArrow',["utils"], function(utils) {
     /** DirectionArrow returns a constructor for an arrow that can be rotated
      and dragged, and supplies its direction.
      */
@@ -3150,7 +3155,7 @@ define('builder/DirectionArrow',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/UndoStack',["vis/utils"], function(utils) {
+define('UndoStack',["utils"], function(utils) {
     /** UndoStack returns a constructor that can be used to store undo info.
      */
     var UndoStack = utils.make_class();
@@ -3224,7 +3229,7 @@ define('builder/UndoStack',["vis/utils"], function(utils) {
     }
 });
 
-define('vis/CallbackManager',["vis/utils"], function(utils) {
+define('CallbackManager',["utils"], function(utils) {
     /** CallbackManager()
 
      */
@@ -3285,7 +3290,7 @@ define('vis/CallbackManager',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/KeyManager',["vis/utils"], function(utils) {
+define('KeyManager',["utils"], function(utils) {
     /** 
      */
 
@@ -3312,10 +3317,11 @@ define('builder/KeyManager',["vis/utils"], function(utils) {
 
 	 */
 
-	if (assigned_keys===undefined) assigned_keys = {};
-	if (reaction_input===undefined) reaction_input = null;
+	if (assigned_keys===undefined) this.assigned_keys = {};
+	else this.assigned_keys = assigned_keys;
+	if (reaction_input===undefined) this.reaction_input = null;
+	else this.reaction_input = reaction_input;
 
-	this.assigned_keys = assigned_keys;
 	this.held_keys = {};
 	reset_held_keys(this.held_keys);
 
@@ -3402,7 +3408,7 @@ define('builder/KeyManager',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/Canvas',["vis/utils"], function(utils) {
+define('Canvas',["utils"], function(utils) {
     /** Defines a canvas that accepts drag/zoom events and can be resized.
 
      Canvas(selection, x, y, width, height)
@@ -3600,7 +3606,7 @@ define('builder/Canvas',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/Scale", "builder/DirectionArrow", "builder/build", "builder/UndoStack", "vis/CallbackManager", "builder/KeyManager", "builder/Canvas"], function(utils, draw, Behavior, Scale, DirectionArrow, build, UndoStack, CallbackManager, KeyManager, Canvas) {
+define('Map',["utils", "draw", "Behavior", "Scale", "DirectionArrow", "build", "UndoStack", "CallbackManager", "KeyManager", "Canvas"], function(utils, draw, Behavior, Scale, DirectionArrow, build, UndoStack, CallbackManager, KeyManager, Canvas) {
     /** Defines the metabolic map data, and manages drawing and building.
 
      Map(selection, defs, zoom_container, height, width, flux, node_data, cobra_model)
@@ -3689,7 +3695,7 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
 	// defaults
 	var default_angle = 90; // degrees
 	this.reaction_arrow_displacement = 35;
-	this.default_reaction_color = '#505050',
+	this.default_reaction_color = '#334E75',
 
 	// make the canvas
 	this.canvas = new Canvas(selection, canvas_size_and_loc);
@@ -3781,8 +3787,8 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
 	map.map_info.largest_ids.segments = largest_segment_id;
 
 	// flux onto existing map reactions
-	if (flux) map.apply_flux_to_map();
-	if (node_data) map.apply_node_data_to_map();
+	map.apply_flux_to_map();
+	map.apply_node_data_to_map();
 
 	return map;
 
@@ -3872,20 +3878,30 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
 	this.callback_manager.run('set_status', status);
     }
     function set_flux(flux) {
+	/** Set a new reaction data, and redraw the map.
+
+	 Pass null to reset the map and draw without reaction data.
+
+	 */
 	this.flux = flux;
 	this.apply_flux_to_map();
 	this.draw_all_reactions();
     }
     function set_node_data(node_data) {
+	/** Set a new metabolite data, and redraw the map.
+
+	 Pass null to reset the map and draw without metabolite data.
+
+	 */
 	this.node_data = node_data;
 	this.apply_node_data_to_map();
 	this.draw_all_nodes();
     }
     function has_flux() {
-	return Boolean(this.flux);
+	return (this.flux!==null);
     }
     function has_node_data() {
-	return Boolean(this.node_data);
+	return (this.node_data!==null);
     }
     function draw_everything() {
         /** Draw the reactions and membranes
@@ -4083,15 +4099,16 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
     function apply_flux_to_reactions(reactions) {
 	for (var reaction_id in reactions) {
 	    var reaction = reactions[reaction_id];
-	    if (reaction.abbreviation in this.flux) {
+	    if (this.flux!==null && reaction.abbreviation in this.flux) {
 		var flux = parseFloat(this.flux[reaction.abbreviation]);
+		if (isNaN(flux)) flux = null;
 		reaction.flux = flux;
 		for (var segment_id in reaction.segments) {
 		    var segment = reaction.segments[segment_id];
 		    segment.flux = flux;
 		}
 	    } else {
-		var flux = 0.0;
+		var flux = null;
 		reaction.flux = flux;
 		for (var segment_id in reaction.segments) {
 		    var segment = reaction.segments[segment_id];
@@ -4107,18 +4124,17 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
 	var vals = [];
 	for (var node_id in nodes) {
 	    var node = nodes[node_id], data = 0.0;
-	    if (node.bigg_id_compartmentalized in this.node_data) {
+	    if (this.node_data!==null && node.bigg_id_compartmentalized in this.node_data) {
 		data = parseFloat(this.node_data[node.bigg_id_compartmentalized]);
-	    }
-	    if (isNaN(data)) {
-		node.data = 0;
-	    } else {
-		vals.push(data);
+		if (isNaN(data)) data = null;
+		else vals.push(data);
 		node.data = data;
+	    } else {
+		node.data = null;
 	    }
-		
 	}
-	var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+	var min = Math.min.apply(null, vals),
+	    max = Math.max.apply(null, vals);
 	this.scale.node_size.domain([min, max]);
 	this.scale.node_color.domain([min, max]);
     }
@@ -4504,6 +4520,7 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
 
         // definitions
 	function extend_and_draw_metabolite(new_nodes, selected_node_id) {
+	    this.apply_node_data_to_nodes(new_nodes);
 	    utils.extend(this.nodes, new_nodes);
 	    this.draw_these_nodes([selected_node_id]);
 	}
@@ -4576,6 +4593,10 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
 	    // remove the selected node so it can be updated
 	    delete this.nodes[selected_node_id];
 	    utils.extend(this.nodes, new_nodes);
+
+	    // apply the reaction and node data
+	    this.apply_node_data_to_nodes(new_nodes);
+	    this.apply_flux_to_reactions(new_reactions);
 
 	    // draw new reaction and (TODO) select new metabolite
 	    this.draw_these_nodes(Object.keys(new_nodes));
@@ -4986,7 +5007,7 @@ define('builder/Map',["vis/utils", "builder/draw", "builder/Behavior", "builder/
     }
 });
 
-define('builder/ZoomContainer',["vis/utils", "vis/CallbackManager"], function(utils, CallbackManager) {
+define('ZoomContainer',["utils", "CallbackManager"], function(utils, CallbackManager) {
     /** ZoomContainer
 
      The zoom behavior is based on this SO question:
@@ -5128,7 +5149,7 @@ define('builder/ZoomContainer',["vis/utils", "vis/CallbackManager"], function(ut
     }
 });
 
-define('builder/Input',["vis/utils",  "lib/complete.ly", "builder/Map", "builder/ZoomContainer", "vis/CallbackManager"], function(utils, completely, Map, ZoomContainer, CallbackManager) {
+define('Input',["utils",  "lib/complete.ly", "Map", "ZoomContainer", "CallbackManager"], function(utils, completely, Map, ZoomContainer, CallbackManager) {
     /**
      */
 
@@ -5164,6 +5185,10 @@ define('builder/Input',["vis/utils",  "lib/complete.ly", "builder/Map", "builder
 	    });
 	this.selection = new_sel;
 	this.completely = c;
+	// close button
+	var self = this;
+	new_sel.append('button').attr('class', "button input-close-button")
+	    .text("×").on('click', function() { self.hide(); });;
 
 	if (map instanceof Map) {
 	    this.map = map;
@@ -5419,7 +5444,7 @@ define('builder/Input',["vis/utils",  "lib/complete.ly", "builder/Map", "builder
 
 });
 
-define('builder/CobraModel',["vis/utils"], function(utils) {
+define('CobraModel',["utils"], function(utils) {
     /**
      */
 
@@ -5435,7 +5460,7 @@ define('builder/CobraModel',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/Brush',["vis/utils"], function(utils) {
+define('Brush',["utils"], function(utils) {
     /** Define a brush to select elements in a map.
 
      Brush(selection, is_enabled, map, insert_after)
@@ -5514,7 +5539,7 @@ define('builder/Brush',["vis/utils"], function(utils) {
     }
 });
 
-define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer", "builder/Map", "builder/CobraModel", "builder/Brush", "vis/CallbackManager"], function(utils, Input, ZoomContainer, Map, CobraModel, Brush, CallbackManager) {
+define('Builder',["utils", "Input", "ZoomContainer", "Map", "CobraModel", "Brush", "CallbackManager"], function(utils, Input, ZoomContainer, Map, CobraModel, Brush, CallbackManager) {
     // NOTE
     // see this thread: https://groups.google.com/forum/#!topic/d3-js/Not1zyWJUlg
     // only necessary for selectAll()
@@ -5538,12 +5563,12 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
     function init(options) {
 	// set defaults
 	var o = utils.set_options(options, {
-	    margins: {top: 0, right: 0, bottom: 0, left: 0},
+	    margins: {top: 5, right: 5, bottom: 5, left: 5},
 	    selection: d3.select("body").append("div"),
 	    selection_is_svg: false,
 	    fillScreen: false,
 	    enable_editing: true,
-	    on_load: function() {},
+	    on_load: null,
 	    map_path: null,
 	    map: null,
 	    cobra_model_path: null,
@@ -5556,11 +5581,15 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	    flux2: null,
 	    node_data: null,
 	    node_data_path: null,
-	    node_data_style: 'ColorSize',
+	    node_data_style: 'ColorSize', // empty value: null
 	    show_beziers: false,
 	    debug: false,
-	    starting_reaction: 'GLCtex',
+	    starting_reaction: 'GLCtex', // empty value: null
 	    reaction_arrow_displacement: 35 });
+	
+	// TODO make each option is neither {}, undefined, nor null
+	// for all cases, set to null to boolean(option) === false
+
 
 	if (o.selection_is_svg) {
 	    // TODO fix this
@@ -5622,7 +5651,7 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 
 	// Check the cobra model
 	var cobra_model = null;
-	if (this.o.cobra_model) {
+	if (this.o.cobra_model!==null) {	    
 	    // TODO better checks
 	    cobra_model = CobraModel(this.o.cobra_model.reactions, this.o.cobra_model.cofactors);
 	} else {
@@ -5647,7 +5676,7 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	var zoomed_sel = this.zoom_container.zoomed_sel;
 
 	var max_w = width, max_h = height, scale;
-	if (this.o.map_data) {
+	if (this.o.map_data!==null) {
 	    // import map
 	    this.map = Map.from_data(this.o.map_data, zoomed_sel, defs, this.zoom_container,
 				height, width, this.o.flux, this.o.node_data, this.o.node_data_style,
@@ -5683,11 +5712,11 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	this.map.key_manager.update();
 	
 	// setup selection box
-	if (this.o.map_data) {
+	if (this.o.map_data!==null) {
 	    this.map.draw_everything();
 	    this.map.zoom_extent_canvas();
 	} else {
-	    if (this.o.starting_reaction) {
+	    if (this.o.starting_reaction!==null) {
 		// Draw default reaction if no map is provided
 		var start_coords = { x: this.map.scale.x.invert(width/2),
 				     y: this.map.scale.x.invert(height/4) };
@@ -5711,7 +5740,8 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	d3.select('#loading').style("display", "none");
 
 	// run the load callback
-	this.o.on_load();
+	if (this.o.on_load!==null)
+	    this.o.on_load();
     }
     function brush_mode() {
 	this.brush.toggle(true);
@@ -5729,9 +5759,10 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	new_button(sel, keys.save, "Save (^s)");
 	new_button(sel, keys.save_svg, "Export SVG (^Shift s)");
 	key_manager.assigned_keys.load.fn = new_input(sel, load_map_for_file, this, "Load (^o)");
-	key_manager.assigned_keys.load_flux.fn = new_input(sel, load_flux_for_file, this, "Load flux (^f)");
-	new_input(sel, load_node_data_for_file, this, "Load node data");
-
+	key_manager.assigned_keys.load_flux.fn = new_input(sel, load_flux_for_file, this, "Load reaction data (^f)");
+	new_button(sel, keys.clear_reaction_data, "Clear reaction data");
+	new_input(sel, load_node_data_for_file, this, "Load metabolite data");
+	new_button(sel, keys.clear_metabolite_data, "Clear metabolite data");
 	var b = new_button(sel, keys.toggle_beziers, "Hide control points (b)", 'bezier-button');
 	map.callback_manager
 	    .set('toggle_beziers.button', function(on_off) {
@@ -5752,10 +5783,10 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	new_button(sel, keys.extent_canvas, "Zoom to canvas (^1)");
 	new_button(sel, keys.make_primary, "Make primary metabolite (p)");
 	new_button(sel, keys.cycle_primary, "Cycle primary metabolite (c)");
-	new_button(sel, keys.direction_arrow_left, "<");
-	new_button(sel, keys.direction_arrow_up, "^");
-	new_button(sel, keys.direction_arrow_down, "v");
-	new_button(sel, keys.direction_arrow_right, ">");
+	new_button(sel, keys.direction_arrow_left, "←");
+	new_button(sel, keys.direction_arrow_up, "↑");
+	new_button(sel, keys.direction_arrow_down, "↓");
+	new_button(sel, keys.direction_arrow_right, "→");
 	new_button(sel, keys.undo, "Undo (^z)");
 	new_button(sel, keys.redo, "Redo (^Shift z)");
 	return sel;
@@ -5775,7 +5806,7 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 	    this.map.set_node_data(data);
 	}
 	function new_button(s, key, name, id) {
-	    var button = s.append("button").attr("class", "command-button");
+	    var button = s.append("button").attr("class", "button command-button");
 	    if (id !== undefined) button.attr('id', id);
 	    return set_button(button, key, name);
 	}
@@ -5795,7 +5826,7 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 		    .style("display", "none")
 		    .on("change", function() { utils.load_json(this.files[0], fn, target); });
 	    s.append("button")
-		.attr("class", "command-button")
+		.attr("class", "button command-button")
 		.text(name)
 		.on('click', function(e) {
 	    	    input.node().click();
@@ -5848,6 +5879,10 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
 		    fn: null }, // defined by button
 	    load_flux: { key: 70, modifiers: { control: true }, // ctrl-f
 			 fn: null }, // defined by button
+	    clear_reaction_data: { target: map,
+			  fn: function() { this.set_flux(null); }},
+	    clear_metabolite_data: { target: map,
+			  fn: function() { this.set_node_data(null); }},
 	    toggle_beziers: { key: 66,
 			      target: map,
 			      fn: map.toggle_beziers,
@@ -5908,7 +5943,7 @@ define('builder/Builder',["vis/utils", "builder/Input", "builder/ZoomContainer",
     }
 });
 
-define('vis/data-menu',["vis/utils"], function(utils) {
+define('DataMenu',["utils"], function(utils) {
     return function(options) {
         var o = utils.set_options(options, {
             selection: d3.select("body"),
@@ -5998,11 +6033,15 @@ define('vis/data-menu',["vis/utils"], function(utils) {
     };
 });
 
-define('main',["builder/Builder", "builder/KeyManager", "vis/data-menu"],
-       function(bu, km, dm) {
+define('main',["Builder", "Map", "Behavior", "KeyManager", "DataMenu", "UndoStack", "utils"],
+       function(bu, mp, bh, km, dm, us, ut) {
            return { Builder: bu,
+		    Map: mp,
+		    Behavior: bh,
 		    KeyManager: km,
-		    DataMenu: dm };
+		    DataMenu: dm,
+		    UndoStack: us,
+		    utils: ut };
        });
 
     //The modules for your project will be inlined above
