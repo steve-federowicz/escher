@@ -864,6 +864,9 @@ define('utils',["lib/vkbeautify"], function(vkbeautify) {
 
         // run
         var out;
+	// set the selection class
+	selection.classed('escher-container', true);
+	// make the svg
         if (selection_is_svg) {
             out = height_width_attr(selection, margins);
             out.svg = selection;
@@ -4114,7 +4117,7 @@ define('Map',["utils", "draw", "Behavior", "Scale", "DirectionArrow", "build", "
 								   'metabolite_data');
 	this.apply_metabolite_data_to_map();
 	if (this.cobra_model !== null) {
-	    this.cobra_model.apply_metabolite_data(this.metabolite_data,
+	    this.cobra_model.apply_metabolite_data(this.metabolite_data_object,
 						   this.metabolite_data_styles);
 	}
 	this.draw_all_nodes();
@@ -5263,7 +5266,7 @@ define('Map',["utils", "draw", "Behavior", "Scale", "DirectionArrow", "build", "
     function zoom_extent_nodes(margin) {
 	/** Zoom to fit all the nodes.
 
-	 margin: optional argument to set the margins.
+	 margin: optional argument to set the margins as a fraction of height.
 
 	 Returns error if one is raised.
 
@@ -5273,7 +5276,7 @@ define('Map',["utils", "draw", "Behavior", "Scale", "DirectionArrow", "build", "
     function zoom_extent_canvas(margin) {
 	/** Zoom to fit the canvas.
 
-	 margin: optional argument to set the margins.
+	 margin: optional argument to set the margins as a fraction of height.
 
 	 Returns error if one is raised.
 
@@ -5291,10 +5294,13 @@ define('Map',["utils", "draw", "Behavior", "Scale", "DirectionArrow", "build", "
 	 */
 
 	// optional args
-	if (margin===undefined) margin = 0;
+	if (margin===undefined) margin = mode=='nodes' ? 0.2 : 0;
 	if (mode===undefined) mode = 'canvas';
 
 	var new_zoom, new_pos;
+	// scale margin to window size
+	margin = margin * this.height;
+
 	if (mode=='nodes') {
 	    // get the extent of the nodes
 	    var min = { x: null, y: null }, // TODO make infinity?
@@ -6017,7 +6023,7 @@ define('Builder',["utils", "Input", "ZoomContainer", "Map", "CobraModel", "Brush
     function init(options) {
 	// set defaults
 	var o = utils.set_options(options, {
-	    margins: {top: 5, right: 5, bottom: 5, left: 5},
+	    margins: {top: 0, right: 0, bottom: 0, left: 0},
 	    selection: d3.select("body").append("div"),
 	    selection_is_svg: false,
 	    fillScreen: false,
@@ -6180,7 +6186,7 @@ define('Builder',["utils", "Input", "ZoomContainer", "Map", "CobraModel", "Brush
 		var start_coords = { x: width/2,
 				     y: height/4 };
 		this.map.new_reaction_from_scratch(this.o.starting_reaction, start_coords);
-		this.map.zoom_extent_nodes(300, 'nodes');
+		this.map.zoom_extent_nodes();
 	    } else {
 		this.map.zoom_extent_canvas();
 	    }
@@ -6339,9 +6345,11 @@ define('Builder',["utils", "Input", "ZoomContainer", "Map", "CobraModel", "Brush
             save: { key: 83, modifiers: { control: true }, // ctrl-s
 		    target: map,
 		    fn: map.save },
-            // save_cmd: { key: 83, modifiers: { command: true }, // command-s
+	    // command-s
+            // save_cmd: { key: 83, modifiers: { command: true },
 	    // 		       fn: save },
-            save_svg: { key: 83, modifiers: { control: true, shift: true }, // ctrl-Shift-s
+	    // ctrl-Shift-s
+            save_svg: { key: 83, modifiers: { control: true, shift: true },
 			target: map,
 			fn: map.save_svg },
             load: { key: 79, modifiers: { control: true }, // ctrl-o
